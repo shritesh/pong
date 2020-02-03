@@ -66,6 +66,13 @@ function render () {
   ctx.fillRect(PADDING, computerY, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, playerY, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(ballX, ballY, BALL_LENGTH, BALL_LENGTH)
+
+  if (!running) {
+    ctx.font = '50px Impact'
+    const msg = 'CLICK HERE TO PLAY'
+    const msgWidth = ctx.measureText(msg).width
+    ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
+  }
 }
 
 setInterval(update, 8)
