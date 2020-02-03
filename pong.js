@@ -13,6 +13,8 @@ const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
 
 let running = false
+const playerScore = 0
+const computerScore = 0
 
 let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
@@ -68,13 +70,17 @@ function render () {
   ctx.lineTo(WIDTH / 2, HEIGHT)
   ctx.stroke()
 
+  ctx.fillStyle = 'gray'
+  ctx.font = '80px Impact'
+  ctx.fillText(computerScore, WIDTH / 4 - 80 / 2, 100)
+  ctx.fillText(playerScore, 3 * WIDTH / 4 - 80 / 2, 100)
+
   ctx.fillStyle = 'white'
   ctx.fillRect(PADDING, computerY, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, playerY, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(ballX, ballY, BALL_LENGTH, BALL_LENGTH)
 
   if (!running) {
-    ctx.font = '50px Impact'
     const msg = 'CLICK HERE TO PLAY'
     const msgWidth = ctx.measureText(msg).width
     ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
