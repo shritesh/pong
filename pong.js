@@ -28,6 +28,14 @@ function render () {
   ctx.fillStyle = 'black'
   ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
+  ctx.strokeStyle = 'gray'
+  ctx.lineWidth = 3
+  ctx.beginPath()
+  ctx.setLineDash([10])
+  ctx.moveTo(WIDTH / 2, 0)
+  ctx.lineTo(WIDTH / 2, HEIGHT)
+  ctx.stroke()
+
   ctx.fillStyle = 'white'
   ctx.fillRect(PADDING, computerPosition, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, playerPosition, PADDLE_WIDTH, PADDLE_HEIGHT)
