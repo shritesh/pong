@@ -12,11 +12,12 @@ const BALL_SPEED = 5
 const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
 
-const computerY = (HEIGHT - PADDLE_HEIGHT) / 2
+let running = false
+
+let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerDy = 0
 
-let running = false
 let ballX = 0
 let ballY = 0
 let ballDx = BALL_SPEED
@@ -47,6 +48,11 @@ function update () {
   if (ballY <= 0) ballDy *= -1
   if (ballY >= HEIGHT - BALL_LENGTH) ballDy *= -1
   if (ballX >= WIDTH - BALL_LENGTH) ballDx *= -1
+
+  if (computerY + PADDLE_HEIGHT / 2 < ballY + BALL_LENGTH / 2) computerY += BALL_SPEED
+  if (computerY + PADDLE_HEIGHT / 2 > ballY + BALL_LENGTH / 2) computerY -= BALL_SPEED
+  if (computerY < 0) computerY = 0
+  if (computerY > HEIGHT - PADDLE_HEIGHT) computerY = HEIGHT - PADDLE_HEIGHT
 }
 
 function render () {
