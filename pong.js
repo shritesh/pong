@@ -13,6 +13,7 @@ const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
 
 let running = false
+// TODO: Scoring
 const playerScore = 0
 const computerScore = 0
 
@@ -20,8 +21,8 @@ let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerDy = 0
 
-let ballX = 0
-let ballY = 0
+let ballX = (WIDTH + BALL_LENGTH) / 2
+let ballY = Math.floor(Math.random() * HEIGHT)
 let ballDx = BALL_SPEED
 let ballDy = BALL_SPEED
 
@@ -46,6 +47,7 @@ function update () {
   ballX += ballDx
   ballY += ballDy
 
+  // TODO: Collision detection with paddles
   if (ballX <= 0) ballDx *= -1
   if (ballY <= 0) ballDy *= -1
   if (ballY >= HEIGHT - BALL_LENGTH) ballDy *= -1
