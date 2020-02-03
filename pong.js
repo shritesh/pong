@@ -8,7 +8,7 @@ const PADDING = 10
 
 const BALL_LENGTH = 10
 // TODO: variable ball speed
-const BALL_SPEED = 3
+const BALL_SPEED = 5
 
 const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
@@ -24,8 +24,8 @@ let playerDy = 0
 
 let ballX = (WIDTH + BALL_LENGTH) / 2
 let ballY = Math.floor(Math.random() * HEIGHT)
-let ballDx = BALL_SPEED
-let ballDy = BALL_SPEED
+let ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3)
+let ballDy = BALL_SPEED * Math.cos(Math.PI * 2 / 3)
 
 canvas.onmousedown = canvas.requestPointerLock
 
@@ -44,9 +44,9 @@ function update () {
   if (newTurn) {
     ballX = (WIDTH + BALL_LENGTH) / 2
     ballY = Math.floor(Math.random() * HEIGHT)
-    ballDx *= -1
-    ballDy *= -1
 
+    ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3)
+    ballDy = BALL_SPEED * Math.cos(Math.PI * 2 / 3)
     computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 
     newTurn = false
@@ -67,10 +67,11 @@ function update () {
   ballX += ballDx
   ballY += ballDy
 
-  // TODO: change ball position based on point of collision
   if (ballX <= PADDING + PADDLE_WIDTH) {
     if (ballY + BALL_LENGTH >= computerY && ballY <= computerY + PADDLE_HEIGHT) {
-      ballDx *= -1
+      const collision = -2 * (computerY + (PADDLE_HEIGHT / 2) - (ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
+      ballDy = Math.sin(collision) * BALL_SPEED
+      ballDx = Math.cos(collision) * BALL_SPEED
     } else {
       playerScore += 1
       newTurn = true
@@ -81,7 +82,9 @@ function update () {
   if (ballY >= HEIGHT - BALL_LENGTH) ballDy *= -1
   if (ballX + BALL_LENGTH >= WIDTH - PADDING - PADDLE_WIDTH) {
     if (ballY + BALL_LENGTH >= playerY && ballY <= playerY + PADDLE_HEIGHT) {
-      ballDx *= -1
+      const collision = -2 * (playerY + (PADDLE_HEIGHT / 2) - (ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
+      ballDy = Math.sin(collision) * BALL_SPEED
+      ballDx = Math.cos(collision) * BALL_SPEED * -1
     } else {
       computerScore += 1
       newTurn = true
