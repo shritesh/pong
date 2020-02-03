@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d')
 const WIDTH = canvas.width
 const HEIGHT = canvas.height
 
-const PADDING = 30
+const PADDING = 10
 
 const BALL_LENGTH = 10
 const BALL_SPEED = 5
@@ -12,10 +12,10 @@ const BALL_SPEED = 5
 const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
 
-let running = false
-// TODO: Scoring
-const playerScore = 0
-const computerScore = 0
+let playing = false
+let newTurn = false
+let playerScore = 0
+let computerScore = 0
 
 let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
@@ -29,7 +29,7 @@ let ballDy = BALL_SPEED
 canvas.onclick = canvas.requestPointerLock
 
 document.addEventListener('pointerlockchange', () => {
-  running = document.pointerLockElement === canvas
+  playing = document.pointerLockElement === canvas
 })
 
 document.addEventListener('mousemove', event => {
@@ -37,26 +37,52 @@ document.addEventListener('mousemove', event => {
 })
 
 function update () {
-  if (!running) return
+  if (!playing) return
+
+  if (newTurn) {
+    ballX = (WIDTH + BALL_LENGTH) / 2
+    ballY = Math.floor(Math.random() * HEIGHT)
+    ballDx *= -1
+    ballDy *= -1
+
+    computerY = (HEIGHT - PADDLE_HEIGHT) / 2
+
+    newTurn = false
+    return
+  }
 
   playerY += playerDy
   playerDy = 0
   if (playerY < 0) playerY = 0
   if (playerY > HEIGHT - PADDLE_HEIGHT) playerY = HEIGHT - PADDLE_HEIGHT
 
+  if (computerY + PADDLE_HEIGHT / 2 < ballY + BALL_LENGTH / 2) computerY += 3
+  if (computerY + PADDLE_HEIGHT / 2 > ballY + BALL_LENGTH / 2) computerY -= 3
+  if (computerY < 0) computerY = 0
+  if (computerY > HEIGHT - PADDLE_HEIGHT) computerY = HEIGHT - PADDLE_HEIGHT
+
   ballX += ballDx
   ballY += ballDy
 
-  // TODO: Collision detection with paddles
-  if (ballX <= 0) ballDx *= -1
+  if (ballX <= PADDING) {
+    if (ballY + BALL_LENGTH >= computerY && ballY <= computerY + PADDLE_HEIGHT) {
+      ballDx *= -1
+    } else {
+      playerScore += 1
+      newTurn = true
+      return
+    }
+  }
   if (ballY <= 0) ballDy *= -1
   if (ballY >= HEIGHT - BALL_LENGTH) ballDy *= -1
-  if (ballX >= WIDTH - BALL_LENGTH) ballDx *= -1
-
-  if (computerY + PADDLE_HEIGHT / 2 < ballY + BALL_LENGTH / 2) computerY += BALL_SPEED
-  if (computerY + PADDLE_HEIGHT / 2 > ballY + BALL_LENGTH / 2) computerY -= BALL_SPEED
-  if (computerY < 0) computerY = 0
-  if (computerY > HEIGHT - PADDLE_HEIGHT) computerY = HEIGHT - PADDLE_HEIGHT
+  if (ballX + BALL_LENGTH >= WIDTH - PADDING - PADDLE_WIDTH) {
+    if (ballY + BALL_LENGTH >= playerY && ballY <= playerY + PADDLE_HEIGHT) {
+      ballDx *= -1
+    } else {
+      computerScore += 1
+      newTurn = true
+    }
+  }
 }
 
 function render () {
@@ -82,7 +108,7 @@ function render () {
   ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, playerY, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(ballX, ballY, BALL_LENGTH, BALL_LENGTH)
 
-  if (!running) {
+  if (!playing) {
     const msg = 'CLICK HERE TO PLAY'
     const msgWidth = ctx.measureText(msg).width
     ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
