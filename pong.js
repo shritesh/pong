@@ -7,7 +7,8 @@ const HEIGHT = canvas.height
 const PADDING = 10
 
 const BALL_LENGTH = 10
-const BALL_SPEED = 5
+// TODO: variable ball speed
+const BALL_SPEED = 3
 
 const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
@@ -26,7 +27,7 @@ let ballY = Math.floor(Math.random() * HEIGHT)
 let ballDx = BALL_SPEED
 let ballDy = BALL_SPEED
 
-canvas.onclick = canvas.requestPointerLock
+canvas.onmousedown = canvas.requestPointerLock
 
 document.addEventListener('pointerlockchange', () => {
   playing = document.pointerLockElement === canvas
@@ -39,6 +40,7 @@ document.addEventListener('mousemove', event => {
 function update () {
   if (!playing) return
 
+  // TODO: game over state
   if (newTurn) {
     ballX = (WIDTH + BALL_LENGTH) / 2
     ballY = Math.floor(Math.random() * HEIGHT)
@@ -56,6 +58,7 @@ function update () {
   if (playerY < 0) playerY = 0
   if (playerY > HEIGHT - PADDLE_HEIGHT) playerY = HEIGHT - PADDLE_HEIGHT
 
+  // TODO: computer difficulty
   if (computerY + PADDLE_HEIGHT / 2 < ballY + BALL_LENGTH / 2) computerY += 3
   if (computerY + PADDLE_HEIGHT / 2 > ballY + BALL_LENGTH / 2) computerY -= 3
   if (computerY < 0) computerY = 0
@@ -64,7 +67,8 @@ function update () {
   ballX += ballDx
   ballY += ballDy
 
-  if (ballX <= PADDING) {
+  // TODO: change ball position based on point of collision
+  if (ballX <= PADDING + PADDLE_WIDTH) {
     if (ballY + BALL_LENGTH >= computerY && ballY <= computerY + PADDLE_HEIGHT) {
       ballDx *= -1
     } else {
