@@ -17,6 +17,7 @@ let playing = false
 let newTurn = false
 let playerScore = 0
 let computerScore = 0
+let turn = 1
 
 let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
@@ -42,10 +43,11 @@ function update () {
 
   // TODO: game over state
   if (newTurn) {
+    turn *= -1
     ballX = (WIDTH + BALL_LENGTH) / 2
     ballY = Math.floor(Math.random() * HEIGHT)
 
-    ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3)
+    ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3) * turn
     ballDy = BALL_SPEED * Math.cos(Math.PI * 2 / 3)
     computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 
