@@ -1,3 +1,4 @@
+// TODO: extract newGame and newTurn
 const canvas = document.querySelector('canvas')
 const ctx = canvas.getContext('2d')
 
@@ -7,7 +8,6 @@ const HEIGHT = canvas.height
 const PADDING = 10
 
 const BALL_LENGTH = 10
-// TODO: variable ball speed
 const BALL_SPEED = 5
 
 const PADDLE_WIDTH = 10
@@ -71,7 +71,6 @@ function update () {
   if (playerY < 0) playerY = 0
   if (playerY > HEIGHT - PADDLE_HEIGHT) playerY = HEIGHT - PADDLE_HEIGHT
 
-  // TODO: computer difficulty
   if (computerY + PADDLE_HEIGHT / 2 < ballY + BALL_LENGTH / 2) computerY += 3
   if (computerY + PADDLE_HEIGHT / 2 > ballY + BALL_LENGTH / 2) computerY -= 3
   if (computerY < 0) computerY = 0
