@@ -29,7 +29,17 @@ let ballY = Math.floor(Math.random() * HEIGHT)
 let ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3)
 let ballDy = BALL_SPEED * Math.cos(Math.PI * 2 / 3)
 
-canvas.onmousedown = canvas.requestPointerLock
+canvas.onmousedown = function () {
+  if (gameOver) {
+    playerScore = 0
+    computerScore = 0
+    turn = 1
+    gameOver = false
+    newTurn = true
+    playing = true
+  }
+  canvas.requestPointerLock()
+}
 
 document.addEventListener('pointerlockchange', () => {
   playing = document.pointerLockElement === canvas
