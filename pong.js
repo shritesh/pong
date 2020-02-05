@@ -1,149 +1,144 @@
-// TODO: extract newGame and newTurn
 const canvas = document.querySelector('canvas')
 const ctx = canvas.getContext('2d')
 
 const WIDTH = canvas.width
 const HEIGHT = canvas.height
-
 const PADDING = 10
-
 const BALL_LENGTH = 10
-const BALL_SPEED = 5
-
 const PADDLE_WIDTH = 10
 const PADDLE_HEIGHT = 50
 
-let playing = false
-let newTurn = false
-let playerScore = 0
-let computerScore = 0
-let turn = 1
-let gameOver = false
+class Game {
+  constructor () {
+    this.newGame()
 
-let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
-let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
-let playerDy = 0
+    this.playing = false
 
-let ballX = (WIDTH + BALL_LENGTH) / 2
-let ballY = Math.floor(Math.random() * HEIGHT)
-let ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3)
-let ballDy = BALL_SPEED * Math.cos(Math.PI * 2 / 3)
-
-canvas.onmousedown = function () {
-  if (gameOver) {
-    playerScore = 0
-    computerScore = 0
-    turn = 1
-    gameOver = false
-    newTurn = true
-    playing = true
-  }
-  canvas.requestPointerLock()
-}
-
-document.addEventListener('pointerlockchange', () => {
-  playing = document.pointerLockElement === canvas
-})
-
-document.addEventListener('mousemove', event => {
-  playerDy = event.movementY
-})
-
-function update () {
-  if (!playing) return
-  if (gameOver) return
-
-  if (newTurn) {
-    turn *= -1
-    ballX = (WIDTH + BALL_LENGTH) / 2
-    ballY = Math.floor(Math.random() * HEIGHT)
-
-    ballDx = BALL_SPEED * Math.sin(Math.PI * 2 / 3) * turn
-    ballDy = BALL_SPEED * Math.cos(Math.PI * 2 / 3)
-    computerY = (HEIGHT - PADDLE_HEIGHT) / 2
-
-    newTurn = false
-    return
-  }
-
-  playerY += playerDy
-  playerDy = 0
-  if (playerY < 0) playerY = 0
-  if (playerY > HEIGHT - PADDLE_HEIGHT) playerY = HEIGHT - PADDLE_HEIGHT
-
-  if (computerY + PADDLE_HEIGHT / 2 < ballY + BALL_LENGTH / 2) computerY += 3
-  if (computerY + PADDLE_HEIGHT / 2 > ballY + BALL_LENGTH / 2) computerY -= 3
-  if (computerY < 0) computerY = 0
-  if (computerY > HEIGHT - PADDLE_HEIGHT) computerY = HEIGHT - PADDLE_HEIGHT
-
-  ballX += ballDx
-  ballY += ballDy
-
-  if (ballX <= PADDING + PADDLE_WIDTH) {
-    if (ballY + BALL_LENGTH >= computerY && ballY <= computerY + PADDLE_HEIGHT) {
-      const collision = -2 * (computerY + (PADDLE_HEIGHT / 2) - (ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
-      ballDy = Math.sin(collision) * BALL_SPEED
-      ballDx = Math.cos(collision) * BALL_SPEED
-    } else {
-      playerScore += 1
-      newTurn = true
-      return
+    canvas.onmousedown = () => {
+      if (this.gameOver) {
+        this.newGame()
+      }
+      canvas.requestPointerLock()
     }
+
+    document.addEventListener('pointerlockchange', () => {
+      this.playing = document.pointerLockElement === canvas
+    })
+    document.addEventListener('mousemove', event => {
+      this.playerDy = event.movementY
+    })
   }
-  if (ballY <= 0) ballDy *= -1
-  if (ballY >= HEIGHT - BALL_LENGTH) ballDy *= -1
-  if (ballX + BALL_LENGTH >= WIDTH - PADDING - PADDLE_WIDTH) {
-    if (ballY + BALL_LENGTH >= playerY && ballY <= playerY + PADDLE_HEIGHT) {
-      const collision = -2 * (playerY + (PADDLE_HEIGHT / 2) - (ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
-      ballDy = Math.sin(collision) * BALL_SPEED
-      ballDx = Math.cos(collision) * BALL_SPEED * -1
-    } else {
-      computerScore += 1
-      newTurn = true
+
+  newGame () {
+    this.playerScore = 0
+    this.computerScore = 0
+    this.turn = 1
+    this.gameOver = false
+    this.ballSpeed = 5
+    this.newTurn()
+  }
+
+  newTurn () {
+    this.ballX = (WIDTH + BALL_LENGTH) / 2
+    this.ballY = Math.floor(Math.random() * (HEIGHT - BALL_LENGTH))
+
+    this.ballDx = this.ballSpeed * Math.sin(Math.PI * 2 / 3) * this.turn
+    this.ballDy = this.ballSpeed * Math.cos(Math.PI * 2 / 3)
+
+    this.computerY = (HEIGHT - PADDLE_HEIGHT) / 2
+    this.playerY = (HEIGHT - PADDLE_HEIGHT) / 2
+    this.playerDy = 0
+
+    this.turn *= -1
+    this.ballSpeed += 0.5
+    this.computerTarget = Math.random() * PADDLE_HEIGHT
+
+    if (this.computerScore >= 10 || this.playerScore >= 10) {
+      this.gameOver = true
+      document.exitPointerLock()
     }
   }
 
-  if (computerScore >= 10 || playerScore >= 10) {
-    gameOver = true
-    document.exitPointerLock()
+  update () {
+    if (!this.playing || this.gameOver) return
+
+    this.playerY += this.playerDy
+    this.playerDy = 0
+    if (this.playerY < 0) this.playerY = 0
+    if (this.playerY > HEIGHT - PADDLE_HEIGHT) this.playerY = HEIGHT - PADDLE_HEIGHT
+
+    if (this.computerY + this.computerTarget < this.ballY + BALL_LENGTH / 2) this.computerY += this.ballSpeed - 3
+    if (this.computerY + this.computerTarget > this.ballY + BALL_LENGTH / 2) this.computerY -= this.ballSpeed - 3
+    if (this.computerY < 0) this.computerY = 0
+    if (this.computerY > HEIGHT - PADDLE_HEIGHT) this.computerY = HEIGHT - PADDLE_HEIGHT
+
+    this.ballX += this.ballDx
+    this.ballY += this.ballDy
+
+    if (this.ballX <= PADDING + PADDLE_WIDTH) {
+      if (this.ballY + BALL_LENGTH >= this.computerY && this.ballY <= this.computerY + PADDLE_HEIGHT) {
+        const collision = -2 * (this.computerY + (PADDLE_HEIGHT / 2) - (this.ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
+        this.ballDy = Math.sin(collision) * this.ballSpeed
+        this.ballDx = Math.cos(collision) * this.ballSpeed
+      } else {
+        this.playerScore += 1
+        this.newTurn()
+        return
+      }
+    }
+    if (this.ballY <= 0) this.ballDy *= -1
+    if (this.ballY >= HEIGHT - BALL_LENGTH) this.ballDy *= -1
+    if (this.ballX + BALL_LENGTH >= WIDTH - PADDING - PADDLE_WIDTH) {
+      if (this.ballY + BALL_LENGTH >= this.playerY && this.ballY <= this.playerY + PADDLE_HEIGHT) {
+        const collision = -2 * (this.playerY + (PADDLE_HEIGHT / 2) - (this.ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
+        this.ballDy = Math.sin(collision) * this.ballSpeed
+        this.ballDx = Math.cos(collision) * this.ballSpeed * -1
+      } else {
+        this.computerScore += 1
+        this.newTurn()
+      }
+    }
+  }
+
+  loop () {
+    window.requestAnimationFrame(() => this.loop())
+
+    this.update()
+
+    ctx.clearRect(0, 0, WIDTH, HEIGHT)
+
+    ctx.strokeStyle = 'gray'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.setLineDash([10])
+    ctx.moveTo(WIDTH / 2, 0)
+    ctx.lineTo(WIDTH / 2, HEIGHT)
+    ctx.stroke()
+
+    ctx.fillStyle = 'gray'
+    ctx.font = '80px Impact'
+    ctx.fillText(this.computerScore, WIDTH / 4 - 80 / 2, 100)
+    ctx.fillText(this.playerScore, 3 * WIDTH / 4 - 80 / 2, 100)
+
+    ctx.fillStyle = 'white'
+    ctx.fillRect(PADDING, this.computerY, PADDLE_WIDTH, PADDLE_HEIGHT)
+    ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, this.playerY, PADDLE_WIDTH, PADDLE_HEIGHT)
+
+    if (!this.gameOver) ctx.fillRect(this.ballX, this.ballY, BALL_LENGTH, BALL_LENGTH)
+
+    if (!this.playing && !this.gameOver) {
+      const msg = 'CLICK HERE TO PLAY'
+      const msgWidth = ctx.measureText(msg).width
+      ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
+    }
+
+    if (this.gameOver) {
+      const msg = 'GAME OVER'
+      const msgWidth = ctx.measureText(msg).width
+      ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
+    }
   }
 }
 
-function render () {
-  window.requestAnimationFrame(render)
-
-  ctx.clearRect(0, 0, WIDTH, HEIGHT)
-
-  ctx.strokeStyle = 'gray'
-  ctx.lineWidth = 3
-  ctx.beginPath()
-  ctx.setLineDash([10])
-  ctx.moveTo(WIDTH / 2, 0)
-  ctx.lineTo(WIDTH / 2, HEIGHT)
-  ctx.stroke()
-
-  ctx.fillStyle = 'gray'
-  ctx.font = '80px Impact'
-  ctx.fillText(computerScore, WIDTH / 4 - 80 / 2, 100)
-  ctx.fillText(playerScore, 3 * WIDTH / 4 - 80 / 2, 100)
-
-  ctx.fillStyle = 'white'
-  ctx.fillRect(PADDING, computerY, PADDLE_WIDTH, PADDLE_HEIGHT)
-  ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, playerY, PADDLE_WIDTH, PADDLE_HEIGHT)
-  ctx.fillRect(ballX, ballY, BALL_LENGTH, BALL_LENGTH)
-
-  if (!playing && !gameOver) {
-    const msg = 'CLICK HERE TO PLAY'
-    const msgWidth = ctx.measureText(msg).width
-    ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
-  }
-
-  if (gameOver) {
-    const msg = 'GAME OVER'
-    const msgWidth = ctx.measureText(msg).width
-    ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
-  }
-}
-
-setInterval(update, 8)
-render()
+const game = new Game()
+game.loop()
