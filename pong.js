@@ -18,6 +18,7 @@ let newTurn = false
 let playerScore = 0
 let computerScore = 0
 let turn = 1
+let gameOver = false
 
 let computerY = (HEIGHT - PADDLE_HEIGHT) / 2
 let playerY = (HEIGHT - PADDLE_HEIGHT) / 2
@@ -40,8 +41,8 @@ document.addEventListener('mousemove', event => {
 
 function update () {
   if (!playing) return
+  if (gameOver) return
 
-  // TODO: game over state
   if (newTurn) {
     turn *= -1
     ballX = (WIDTH + BALL_LENGTH) / 2
@@ -92,6 +93,11 @@ function update () {
       newTurn = true
     }
   }
+
+  if (computerScore >= 10 || playerScore >= 10) {
+    gameOver = true
+    document.exitPointerLock()
+  }
 }
 
 function render () {
@@ -117,8 +123,14 @@ function render () {
   ctx.fillRect(WIDTH - PADDING - PADDLE_WIDTH, playerY, PADDLE_WIDTH, PADDLE_HEIGHT)
   ctx.fillRect(ballX, ballY, BALL_LENGTH, BALL_LENGTH)
 
-  if (!playing) {
+  if (!playing && !gameOver) {
     const msg = 'CLICK HERE TO PLAY'
+    const msgWidth = ctx.measureText(msg).width
+    ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
+  }
+
+  if (gameOver) {
+    const msg = 'GAME OVER'
     const msgWidth = ctx.measureText(msg).width
     ctx.fillText(msg, (WIDTH - msgWidth) / 2, (HEIGHT + 50) / 2)
   }
