@@ -80,6 +80,7 @@ class Game {
         const collision = -2 * (this.computerY + (PADDLE_HEIGHT / 2) - (this.ballY + BALL_LENGTH / 2)) / PADDLE_HEIGHT
         this.ballDy = Math.sin(collision) * this.ballSpeed
         this.ballDx = Math.cos(collision) * this.ballSpeed
+        this.computerTarget = Math.random() * PADDLE_HEIGHT
       } else {
         this.playerScore += 1
         this.newTurn()
