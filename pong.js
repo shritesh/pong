@@ -117,7 +117,7 @@ class Game {
     ctx.stroke()
 
     ctx.fillStyle = 'gray'
-    ctx.font = '80px Impact'
+    ctx.font = '80px Impact, Charcoal, sans-serif'
     ctx.fillText(this.computerScore, WIDTH / 4 - 80 / 2, 100)
     ctx.fillText(this.playerScore, 3 * WIDTH / 4 - 80 / 2, 100)
 
@@ -127,6 +127,7 @@ class Game {
 
     if (!this.gameOver) ctx.fillRect(this.ballX, this.ballY, BALL_LENGTH, BALL_LENGTH)
 
+    ctx.font = '50px Impact, Charcoal, sans-serif'
     if (!this.playing && !this.gameOver) {
       const msg = 'CLICK HERE TO PLAY'
       const msgWidth = ctx.measureText(msg).width
